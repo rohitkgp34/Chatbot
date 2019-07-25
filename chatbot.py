@@ -6,7 +6,7 @@ import re
 lines = open('movie_lines.txt', encoding='utf-8', errors='ignore').read().split('\n')
 conversations = open('movie_conversations.txt', encoding='utf-8', errors='ignore').read().split('\n')
 
-#Creating a dictionary that maps each line and its id
+# Creating a dictionary that maps each line and its id
 id2line = {}
 for line in lines:
     _line = line.split(' +++$+++ ')
@@ -27,7 +27,7 @@ for conversation in conversations_ids:
         questions.append(id2line[conversation[i]])
         answers.append(id2line[conversation[i+1]])
 
-#Just for checking
+# Just for checking
 print(len(conversations_ids))
 print(conversation[0])
 print(id2line[conversation[0]])
@@ -36,7 +36,7 @@ print(id2line[conversation[0]])
 print(len(questions))
 print(len(answers))
 
-#Clean text by removing unnecessary characters and altering the format of words
+# Clean text by removing unnecessary characters and altering the format of words
 def clean_text(text):
     text = text.lower()
     text = re.sub(r"i'm", "i am", text)
@@ -61,12 +61,12 @@ def clean_text(text):
     text = re.sub(r"[-()\"#/@;:<>{}`+=~|.!?,]", "", text)
     return text
 
-#Cleaning of questions
+# Cleaning of questions
 clean_questions = []
 for question in questions:
     clean_questions.append(clean_text(question))
     
-#Cleaning of answers
+# Cleaning of answers
 clean_answers = []
 for answer in answers:
     clean_answers.append(clean_text(answer))
@@ -101,3 +101,45 @@ for word, count in word2count.items():
     if count >= threshold:
         answerswords2int[word] = word_number
         word_number += 1
+  
+# Check      
+if (questionswords2int == answerswords2int):
+    print('true')
+else:
+    print('false')
+    
+# Adding the last tokesn to the above dictinary
+tokens = ['<PAD>','<EOS>','<OUT>','SOS']
+for token in tokens:
+    questionswords2int[token] = len(questionswords2int) + 1
+for token in tokens:
+    answerswords2int[token] = len(answerswords2int) + 1
+
+# Creating the inverse dict of answerswords2int
+answersint2words = {w_i : w for w, w_i in answerswords2int.items()}
+
+# Adding the EOS token to the end of every answer
+for i in range(len(clean_answers)):
+    clean_answers[i] += ' <EOS>'
+    
+# Translating all the ques and ans list int o integers and
+# Replacing the all the filtered out words with <EOS> token
+questions_into_int = []
+for question in clean_questions:
+    ints = []
+    for word in question:
+        if word not in questionswords2int:
+            ints.append(questionswords2int['<EOS>'])
+        else:
+            ints.append(questionswords2int[word])
+    questions_into_int.append(ints)
+            
+answers_into_int = []
+for answer in clean_answers:
+    ints = []
+    for word in answer:
+        if word not in answerswords2int:
+            ints.append(answerswords2int['<EOS>'])
+        else:
+            ints.append(answerswords2int[word])
+    answers_into_int.append(ints)
