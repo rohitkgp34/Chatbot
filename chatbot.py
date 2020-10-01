@@ -2,6 +2,8 @@ import numpy as np
 import tensorflow as tf
 import time
 import re
+import pandas as pf
+import matplotlib.pyplot plt
 
 lines = open('movie_lines.txt', encoding='utf-8', errors='ignore').read().split('\n')
 conversations = open('movie_conversations.txt', encoding='utf-8', errors='ignore').read().split('\n')
